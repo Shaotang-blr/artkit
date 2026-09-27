@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ArtKit test page</title>
+<style>
+  body { margin: 0; background: #2b2d31; color: #ddd; font: 14px system-ui, sans-serif; }
+  h1 { font-size: 16px; margin: 12px 20px; }
+  .wrap { display: flex; gap: 30px; padding: 0 20px; }
+  canvas { background: #fff; cursor: crosshair; }
+  p { margin: 4px 0; }
+</style>
+<script src="../main.js"></script>
+<script>window.__artkitTest = true;</script>
+<script src="../content.js"></script>
+</head>
+<body>
+<h1>ArtKit test page: left draws with mouse events, right with pointer events</h1>
+<div class="wrap">
+  <div><canvas id="m" width="420" height="420"></canvas><p id="mi"></p></div>
+  <div><canvas id="p" width="300" height="300" style="width:450px;height:450px"></canvas><p id="pi"></p></div>
+  <div><canvas id="k" width="274" height="405"></canvas><p id="ki">Karuta-like: 274x405, 7 px round brush, pointer events</p></div>
+</div>
+<script>
+  // A minimal drawing app, like most sites: down starts a stroke, every move adds a point, up ends it.
+  window.strokes = { m: [], p: [] };
+  function app(id, fam) {
+    const c = document.getElementById(id), ctx = c.getContext("2d");
+    let cur = null;
+    const pt = (e) => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) * c.width / r.width, (e.clientY - r.top) * c.height / r.height]; };
+    c.addEventListener(fam + "down", (e) => { cur = [pt(e)]; strokes[id].push(cur); });
+    document.addEventListener(fam + "move", (e) => {
+      if (!cur) return;
+      const q = pt(e), p = cur[cur.length - 1];
+      cur.push(q);
+      ctx.lineWidth = 3; ctx.lineCap = "round"; ctx.strokeStyle = "#222";
+      ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
+    });
+    document.addEventListener(fam + "up", () => {
+      if (cur) document.getElementById(id + "i").textContent = `last stroke: ${cur.length} points`;
+      cur = null;
+    });
+  }
+  app("m", "mouse");
+  // Karuta-like canvas: fills with a 7 px round brush in red
+  (function () {
+    const c = document.getElementById("k"), ctx = c.getContext("2d"); let cur = null; strokes.k = [];
+    const pt = (e) => { const r = c.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    c.addEventListener("pointerdown", (e) => { cur = [pt(e)]; strokes.k.push(cur); ctx.fillStyle = "#e33"; ctx.beginPath(); ctx.arc(cur[0][0], cur[0][1], 3.5, 0, 7); ctx.fill(); });
+    document.addEventListener("pointermove", (e) => { if (!cur) return; const q = pt(e), p = cur[cur.length - 1]; cur.push(q);
+      ctx.strokeStyle = "#e33"; ctx.lineWidth = 7; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke(); });
+    document.addEventListener("pointerup", () => { cur = null; });
+  })();
+  app("p", "pointer");
+</script>
+</body>
+</html>
