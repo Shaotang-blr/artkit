@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "manifest_version": 3,
   "name": "ArtKit - drawing tools for web canvases",
@@ -34,4 +35,42 @@
       "all_frames": false
     }
   ]
+=======
+{
+  "manifest_version": 3,
+  "name": "ArtKit - drawing tools for web canvases",
+  "version": "0.2.0",
+  "description": "Ruler, steady hand, grid and tracing paper for drawing on any website canvas (made for Karuta Studio).",
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "main.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ]
+>>>>>>> 5e2906bb3d495c98dba0bb3805037cbb2bf97a17
 }
